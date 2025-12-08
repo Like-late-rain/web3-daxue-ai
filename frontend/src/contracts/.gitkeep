@@ -1,0 +1,5 @@
+# 此目录用于存放合约 ABI 和地址文件
+# 部署后会自动生成以下文件：
+# - YCToken.json
+# - UniversityCourse.json
+# - addresses.json

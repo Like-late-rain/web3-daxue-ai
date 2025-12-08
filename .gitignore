@@ -102,3 +102,5 @@ public/fallback-*.js
 # Local deployment files
 frontend/src/contracts/addresses.json
 shared/addresses.json
+
+DEPLOYMENT_SUCCESS.md

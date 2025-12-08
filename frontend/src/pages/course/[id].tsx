@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -19,10 +20,36 @@ export default function CourseDetail() {
   const { useCourse, usePurchaseCourse, useHasPurchased } = useUniversityCourse();
   const { useApprove } = useYCToken();
 
-  const { data: course, isLoading } = useCourse(courseId);
-  const { data: hasPurchased } = useHasPurchased(courseId, address);
-  const { purchaseCourse, isPending: isPurchasing } = usePurchaseCourse();
-  const { approve, isPending: isApproving } = useApprove();
+  const { data: course, isLoading, refetch: refetchCourse } = useCourse(courseId);
+  const { data: hasPurchased, refetch: refetchHasPurchased } = useHasPurchased(courseId, address);
+  const { purchaseCourse, isPending: isPurchasing, isSuccess: purchaseSuccess } = usePurchaseCourse();
+  const { approve, isPending: isApproving, isSuccess: approveSuccess } = useApprove();
+
+  const [hasProcessedApprove, setHasProcessedApprove] = useState(false);
+  const [hasProcessedPurchase, setHasProcessedPurchase] = useState(false);
+
+  // 监听授权成功
+  useEffect(() => {
+    if (approveSuccess && !hasProcessedApprove) {
+      console.log('✅ 授权成功，准备购买课程');
+      setHasProcessedApprove(true);
+      purchaseCourse(courseId);
+    }
+  }, [approveSuccess, hasProcessedApprove, courseId]);
+
+  // 监听购买成功
+  useEffect(() => {
+    if (purchaseSuccess && !hasProcessedPurchase) {
+      console.log('🎉 购买成功！');
+      setHasProcessedPurchase(true);
+      showSuccessToast('购买成功！课程已添加到个人中心');
+      // 延迟刷新，确保区块链状态已更新
+      setTimeout(() => {
+        refetchCourse();
+        refetchHasPurchased();
+      }, 2000);
+    }
+  }, [purchaseSuccess, hasProcessedPurchase]);
 
   const handlePurchase = async () => {
     if (!isConnected) {
@@ -33,13 +60,14 @@ export default function CourseDetail() {
     if (!course) return;
 
     try {
-      // 先授权 YCT
-      await approve(addresses.UniversityCourse, course.priceYCT);
-      showSuccessToast('授权成功，正在购买课程...');
-
-      // 然后购买课程
-      await purchaseCourse(courseId);
+      console.log('开始授权 YCT...');
+      // 重置状态
+      setHasProcessedApprove(false);
+      setHasProcessedPurchase(false);
+      // 授权 YCT
+      approve(addresses.UniversityCourse, course.priceYCT);
     } catch (error: any) {
+      console.error('购买失败:', error);
       showErrorToast(error.message || '购买失败');
     }
   };

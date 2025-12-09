@@ -1,0 +1,22 @@
+# Build caches
+cache/
+.cache/
+.next/cache/
+
+# Webpack cache
+**/cache/webpack/
+
+# Node modules
+node_modules/
+
+# Development files
+.git/
+.vscode/
+.idea/
+
+# Hardhat
+artifacts/
+typechain-types/
+
+# Logs
+*.log

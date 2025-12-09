@@ -12,12 +12,6 @@ export default function Market() {
   const { data: courses, isLoading } = useActiveCourses(0, 100);
   const { data: courseCounter } = useCourseCounter();
 
-  console.log("=== Market 页面调试信息 ===");
-  console.log("courseCounter:", courseCounter?.toString());
-  console.log("courses 数据:", courses);
-  console.log("courses 数量:", courses?.length || 0);
-  console.log("isLoading:", isLoading);
-
   // 搜索过滤
   const filteredCourses = useMemo(() => {
     if (!courses) return [];

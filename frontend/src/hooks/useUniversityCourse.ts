@@ -14,7 +14,7 @@ export const useUniversityCourse = () => {
 
   // 获取课程详情
   const useCourse = (courseId: number) => {
-    return useReadContract({
+    const result = useReadContract({
       address: contractAddress,
       abi: UniversityCourseABI.abi,
       functionName: "getCourse",
@@ -23,7 +23,13 @@ export const useUniversityCourse = () => {
       query: {
         enabled: courseId > 0
       }
-    }) as { data: Course | undefined; isLoading: boolean; error: Error | null };
+    });
+    return {
+      data: result.data as Course | undefined,
+      isLoading: result.isLoading,
+      error: result.error,
+      refetch: result.refetch
+    };
   };
 
   // 获取活跃课程列表

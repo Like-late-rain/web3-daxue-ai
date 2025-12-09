@@ -1,4 +1,4 @@
-import { getDefaultConfig, getDefaultWallets } from '@rainbow-me/rainbowkit';
+import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { sepolia } from 'wagmi/chains';
 import { defineChain } from 'viem';
 
@@ -19,27 +19,13 @@ const hardhatLocal = defineChain({
   testnet: true,
 });
 
-const chains = [hardhatLocal, sepolia];
+const chains = [hardhatLocal, sepolia] as const;
 const appName = 'Web3 涂山大学';
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID';
-
-const { wallets } = getDefaultWallets({
-  appName,
-  projectId,
-  chains,
-});
-
-const walletsWithoutBaseAccount = wallets
-  .map((group) => ({
-    ...group,
-    wallets: group.wallets.filter((wallet) => wallet.id !== 'baseAccount'),
-  }))
-  .filter((group) => group.wallets.length > 0);
 
 export const config = getDefaultConfig({
   appName,
   projectId,
-  chains,
-  wallets: walletsWithoutBaseAccount,
+  chains: [hardhatLocal, sepolia],
   ssr: true,
 });

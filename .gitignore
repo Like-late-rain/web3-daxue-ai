@@ -100,7 +100,7 @@ public/fallback-*.js
 .wrangler/
 
 # Local deployment files
-frontend/src/contracts/addresses.json
+# frontend/src/contracts/addresses.json
 shared/addresses.json
 
 DEPLOYMENT_SUCCESS.md

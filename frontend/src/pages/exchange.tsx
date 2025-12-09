@@ -10,7 +10,7 @@ import { showErrorToast, showSuccessToast } from "@/utils/toast";
 
 export default function Exchange() {
   const { address, isConnected } = useAccount();
-  const { data: ethBalance } = useBalance({ address });
+  const { data: ethBalance, refetch: refetchETHBalance } = useBalance({ address });
   const {
     useBalance: useYCTBalance,
     useBuyTokens,
@@ -98,19 +98,22 @@ export default function Exchange() {
       console.log("📝 交易 hash:", buyHash);
       console.log("👤 买家地址:", address);
 
-      // 延迟刷新，确保区块链状态已更新
-      setTimeout(() => {
-        refetchYCTBalance().then((result) => {
-          console.log("💰 余额刷新结果:", result);
-          console.log("💰 刷新后的余额 data:", result.data);
-        });
-      }, 1000);
-
       showSuccessToast("购买成功！YCT 已到账");
       setEthAmount("");
       setYCTAmount("");
+
+      // 延迟刷新，确保区块链状态已更新
+      setTimeout(() => {
+        Promise.all([
+          refetchETHBalance(),
+          refetchYCTBalance()
+        ]).then(([ethResult, yctResult]) => {
+          console.log("💰 ETH 余额刷新结果:", ethResult);
+          console.log("💰 YCT 余额刷新结果:", yctResult);
+        });
+      }, 2000);
     }
-  }, [buySuccess, buyHash, address, refetchYCTBalance]);
+  }, [buySuccess, buyHash, address, refetchETHBalance, refetchYCTBalance]);
 
   // 监听出售成功
   useEffect(() => {
@@ -118,10 +121,16 @@ export default function Exchange() {
       showSuccessToast("出售成功！ETH 已到账");
       setEthAmount("");
       setYCTAmount("");
-      // 刷新 YCT 余额
-      refetchYCTBalance();
+
+      // 延迟刷新，确保区块链状态已更新
+      setTimeout(() => {
+        Promise.all([
+          refetchETHBalance(),
+          refetchYCTBalance()
+        ]);
+      }, 2000);
     }
-  }, [sellSuccess, refetchYCTBalance]);
+  }, [sellSuccess, refetchETHBalance, refetchYCTBalance]);
 
   return (
     <>
